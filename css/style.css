@@ -65,3 +65,12 @@ h1{
   left: 50%;
   top: 300px;
 }
+
+canvas { 
+  border: 1px solid black; 
+  transform: translate(-50%, -50%);
+  position: absolute;
+  display: block;
+  left: 50%;
+  top: 300px;
+}
