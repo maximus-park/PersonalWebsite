@@ -11,47 +11,7 @@ ctx.textAlign = "center";
 
 var textFont = "px Helvetica bold"
 
-var canvasData = {
-	width: width,
-	height: height,
-	deadRed: [],
-	deadGree: [],
-	snowSplashes: [],
-	fallingSnowBall: [],
-	snowBallSpeed: 5,
-	boxHeight: 5,
-	boxWidth: 10,
-	playerSelected: [false, 0, 0],
-	width: width,
-	hitTime: 100,
-	fallSpeed: 5,
-	redPlayersList: [],
-	greenPlayersList: [],
-	redSnow: [],
-	greenSnow: [],
-	throwStrength: 0,
-	d: {},
-	throwStrengthMaximum: function() {
-		return (width) / this.snowBallSpeed;
-	},
-	shadowDistance: 25,
-	maxHitCount: 3,
-	mouse: {
-		x: 0,
-		y: 0,
-	},
-	steps: 50,
-	snowballCounter: 0,
-	playerRadius: 30,
-	paused: false,
-	snowballThrown: false,
-	snowballSize: function () {
-		return this.playerRadius / 2;
-	},
-	level: 0,
-	instruction: false,
-	paused: false,
-}
+var canvasData = {}
 
 var imageCount = 0;
 var audioCount = 0;
@@ -148,13 +108,39 @@ function playNewLevel() {
 }
 
 function keyPressed(e) {
-    if (e.key == "Enter") {
-        playNewLevel();
-        gameStart();
+    if (e.key == "Enter" && canvasData.level == 0 && canvasData.instruction == false) { // must be at starting screen
+        startGame();
     }
     if (e.key == "h") {
     	setInstructions();
-    }                                  
+    }
+    // if (e.key == "w") {
+    //     canvasData.greenPlayersList = [] #cheats
+    // }
+    if (e.key == "l") {
+        canvasData.redPlayersList = []; //cheats
+    }
+    // if (e.key == "q") {
+    //     qPressed();
+    // }
+    // if (e.key == "r") {
+    //     rPressed();
+    // }
+    // if (e.key=="p" && canvasData.instruction == false)  {
+    //     canvasData.paused = !canvasData.paused
+    // }
+    // if (e.key == "n"
+    //    and len(canvasData.greenPlayersList) == 0 and canvasData.level != 0) {
+    //     nPressed(); //can only go to next level when player has beaten level
+    // }
+    // redrawAll();                                  
+}
+
+function startGame() { //start the game
+    playNewLevel();
+    canvasData.loadTimer = 100
+    canvasData.level = 1
+    init();
 }
 
 function setInstructions() { //show instructions
@@ -166,7 +152,7 @@ function clearCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function gameStart() {  //starting screen
+function drawStartScreen() {  //starting screen
 	width = canvas.width;
 	height = canvas.height;
 	textSize = 50;
@@ -191,38 +177,40 @@ function redrawAll() {
         return; //don't do anything else
     }
     if (canvasData.level == 0) {
-        gameStart(); //starting screen
+        drawStartScreen(); //starting screen
     }
     // if len(canvasData.redPlayersList) ==0 or\
     //    len(canvasData.greenPlayersList)==0:
     //     canvasData.paused = True //game is paused in between levels
     //     canvasData.playerSelected[0]=False //player is no longer selected
-    // for player in canvasData.redPlayersList: createRedPlayers(player)
+    for (player = 0; player < canvasData.redPlayersList.length; player++) {
+        drawRedPlayers(player);
+    }
     // for player in canvasData.greenPlayersList: createGreenPlayers(player)
     // if canvasData.snowballThrown == True: drawSnowball()
     // if canvasData.playerSelected[0] == True: drawThrowStrength(), snowHand()
-    // drawFallingSnowBall(),drawSnowSplashes(),drawLevelLoad(),gameOver()
+    // drawFallingSnowBall(), drawSnowSplashes(), drawLevelLoad(), gameOver()
 }
 
 ////////////////////////Instructions
 function drawInstructions() { //instruction screen
-    x = canvasData.width
-    y = canvasData.height
+    x = canvasData.width;
+    y = canvasData.height;
     var text = [];
-    text[text.length] = "Click on red player to select player."
-    text[text.length] = "Drag mouse to move player release mouse to throw snowball."
-    text[text.length] = "Green bars next to player indicates strength of the throw."
-    text[text.length] = "Hit each green player three times to knock them out. "
-    text[text.length] = "On seond hit green player will fall. "
-    text[text.length] = "Green player may not be hit while on ground. "
-    text[text.length] = "Once all green players are knocked out, you win! "
-    text[text.length] = "If red player is hit, player is stunned for a bit. "
-    text[text.length] = "If stunned player is hit again, player is knocked out. "
-    text[text.length] = "Players may not cross into enemy territory. "
-    text[text.length] = "Press 'h' to resume play. "
-    text[text.length] = "Press 'p' to pause. "
-    text[text.length] = "Press 'q' to return to starting screen. "
-    text[text.length] = "Press 'r' to restart current level. "
+    text[text.length] = "Click on red player to select player.";
+    text[text.length] = "Drag mouse to move player release mouse to throw snowball.";
+    text[text.length] = "Green bars next to player indicates strength of the throw.";
+    text[text.length] = "Hit each green player three times to knock them out. ";
+    text[text.length] = "On seond hit green player will fall. ";
+    text[text.length] = "Green player may not be hit while on ground. ";
+    text[text.length] = "Once all green players are knocked out, you win! ";
+    text[text.length] = "If red player is hit, player is stunned for a bit. ";
+    text[text.length] = "If stunned player is hit again, player is knocked out. ";
+    text[text.length] = "Players may not cross into enemy territory. ";
+    text[text.length] = "Press 'h' to resume play. ";
+    text[text.length] = "Press 'p' to pause. ";
+    text[text.length] = "Press 'q' to return to starting screen. ";
+    text[text.length] = "Press 'r' to restart current level. ";
     textSize = 20;
     ctx.font = textSize + textFont;
     for (i = 0; i < text.length; i++) {
@@ -233,6 +221,8 @@ function drawInstructions() { //instruction screen
 ////////////////////////
 
 function drawBackGround() {
+    width = canvasData.width;
+    height = canvasData.height;
     background = canvasData.images["background"]
 	ctx.drawImage(background, 0, 0, width, height);
 }
@@ -257,27 +247,29 @@ function timerFired() {
     if (!audioLoaded) {
         waitAudioLoad();
     }
-    // if (canvasData.paused == false) { //only if game isn't paused  
-    //     if (canvasData.playerSelected[0] == true) {
-    //     	canvasData.throwStrength += 1;
-    //     }
-    //     snowBallSpeed = canvasData.snowBallSpeed;     //throw strength increases
-        // for (i = 0; i < canvasData.redSnow.length(); i++) {
-        // 	index = canvasData.redSnow[i];
-        //     (l,t,r,b,throwStrength) = canvasData.d[index]; //move snowball
-        //     canvasData.d[index] = (l - snowBallSpeed, t - snowBallSpeed,
-        //                            r - snowBallSpeed, b - snowBallSpeed,
-        //                            throwStrength - 1);
-        // }
-        // for element in canvasData.greenSnow: //move snowball
-        //     (l,t,r,b,throwStrength) = canvasData.d[element]
-        //     canvasData.d[element]=(l+snowBallSpeed,t+snowBallSpeed,\
-        //                             r+snowBallSpeed,b+snowBallSpeed,\
-        //                             throwStrength)
-        // greenPlayerAI();
-        // checkGreen();
-        // checkRed();
+    if (canvasData.paused) {
+        redrawAll();
+        return;
+    } 
+    if (canvasData.playerSelected[0] == true) {
+    	canvasData.throwStrength += 1;
+    }
+    snowBallSpeed = canvasData.snowBallSpeed;     //throw strength increases
+    // for (i = 0; i < canvasData.redSnow.length; i++) {
+    // 	index = canvasData.redSnow[i];
+    //     (l, t, r, b, throwStrength) = canvasData.d[index]; //move snowball
+    //     canvasData.d[index] = (l - snowBallSpeed, t - snowBallSpeed, 
+    //                            r - snowBallSpeed, b - snowBallSpeed, 
+    //                            throwStrength - 1);
     // }
+    // for element in canvasData.greenSnow: //move snowball
+    //     (l, t, r, b, throwStrength) = canvasData.d[element]
+    //     canvasData.d[element]=(l+snowBallSpeed, t+snowBallSpeed, \
+    //                             r+snowBallSpeed, b+snowBallSpeed, \
+    //                             throwStrength)
+    // greenPlayerAI();
+    // checkGreen();
+    // checkRed();
     redrawAll();
 }
 ///////////////
@@ -285,13 +277,112 @@ function timerFired() {
 function init() {  //stores initial values
     initImages();
     initAudios();
+    canvasData.deadRed = [];
+    canvasData.deadGreen = [];
+    canvasData.snowSplashes = [];
+    canvasData.fallingSnowBall = []; 
+    canvasData.snowBallSpeed = 5;
+    canvasData.boxHeight = 5;
+    canvasData.boxWidth = 10;
+    canvasData.playerSelected = [false, 0, 0];
+    width = canvasData.width;
+    canvasData.hitTime = 100;
+    canvasData.fallSpeed= 5;
+    canvasData.redPlayersList = [];
+    canvasData.greenPlayersList = [];
+    canvasData.redSnow = [];
+    canvasData.greenSnow = [];
+    canvasData.throwStrength = 0;
+    canvasData.d = {};
+    canvasData.throwStrengthMaximum = (width) / canvasData.snowBallSpeed;
+    canvasData.shadowDistance = 25;
+    canvasData.maxHitCount = 3;
+    canvasData.mouse["leftPosn"] = (0, 0)
+    canvasData.steps = 50;
+    canvasData.snowBallCounter = 0;
+    canvasData.playerRadius = width / 30;
+    canvasData.paused = false;
+    canvasData.snowballThrown = false;
+    canvasData.snowballSize = canvasData.playerRadius / 2;
+    if (canvasData.level == 1) {
+        initialRedPlayers();
+        // ,initialGreenLevelOne()
+    }
+    if (canvasData.level == 2) {
+        initialRedPlayers();
+        // ,initialGreenLevelOne(),initialGreenLevelTwo()
+    }
+    // for (player in canvas.data.redPlayersList)
+    //     createRedPlayers(element);
+
+}
+
+function Player(x, y, hitTime) {
+    this.x = x;
+    this.y = y;
+    this.hitTime = hitTime;
+}
+
+function initialRedPlayers() { //creates 3 red players at initial locations
+    width = canvasData.width;
+    height = canvasData.height;
+    hitTime = 0;
+    playerRadius = canvasData.playerRadius;
+    redOneX = ((width * 3) / 5) + playerRadius;
+    redOneY = ((height / 3) * 2) + playerRadius;
+    redTwoX = redOneX + (playerRadius * 3);
+    redTwoY = redOneY;
+    redThreeX = redOneX + (playerRadius * 3);
+    redThreeY = redOneY - (playerRadius * 3);
+    canvasData.redplayersList = [];
+    canvasData.redPlayersList[0] = new Player(redOneX, redOneY, hitTime);
+    canvasData.redPlayersList[1] = new Player(redTwoX, redTwoY, hitTime);
+    canvasData.redPlayersList[2] = new Player(redThreeX, redThreeY, hitTime);
+}
+
+function drawRedPlayers(player) {  //creates red players at given location
+    x = canvasData.redPlayersList[player].x;
+    y = canvasData.redPlayersList[player].y;
+    hitTime = canvasData.redPlayersList[player].hitTime;
+    rStand = canvasData.images["rstand"];
+    rSelected = canvasData.images["rselected"];
+    rPlayerHit = canvasData.images["rplayerhit"];
+    dead = canvasData.audios["dead"];
+    playerRadius = canvasData.playerRadius;
+    playerWidth = playerRadius * 2;
+    playerHeight = playerRadius * 2;
+    if (hitTime > canvasData.hitTime) { //the player was hit while stunned
+        dead.play();
+        delete canvasData.redPlayers.player;
+        canvasData.deadRed.push([x, y]); //draw dead player on background
+    }
+    else if (hitTime > 0) { //the player was hit while not stunned
+        rPlayerHit = canvasData.images["rPlayerHit"];
+        ctx.drawImage(rPlayerHit, x, y - playerRadius, playerWidth, playerHeight);
+    }
+    else if (canvasData.playerSelected == [true, x, y]) { //draw image for selected player
+        rSelected = canvasData.images["rSelected"];
+        ctx.drawImage(rSelected, x, y - playerRadius, playerWidth, playerHeight);
+    }
+    else {
+        rStand = canvasData.images["rStand"];
+        ctx.drawImage(rStand, x, y - playerRadius, playerWidth, playerHeight);
+    }
+    //otherwise, player is just standing
 }
 
 window.onload = function () {
+    canvasData.level = 0;
+    canvasData.width = width;
+    canvasData.height = height;
+    canvasData.mouse = {};
+    canvasData.level = 0;
+    canvasData.loadTimer = 0;
+    canvasData.instruction = false;
+    canvasData.playerSelected = [false, 0, 0];
+    canvasData.redPlayersList = [];
 	init();
 	delay = 5;
-    // drawBackGround();
-    // setInterval(timerFired(), delay);
 	setInterval(timerFired, delay);
     document.addEventListener('keypress', keyPressed);
 };
