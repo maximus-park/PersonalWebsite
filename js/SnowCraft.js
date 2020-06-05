@@ -18,6 +18,94 @@ var audioCount = 0;
 var imagesLoaded = false;
 var audioLoaded = false;
 
+function Player(x, y, hitTime, hitCount) {
+    this.x = x;
+    this.y = y;
+    this.hitTime = hitTime;
+    this.hitCount = hitCount;
+}
+
+////////////////////////Initialize
+function initialGreenLevel(level) { //creates green initial green players for level one
+    playerSeparation = 4 * canvasData.playerRadius;
+    greenOneX = canvasData.width / 10;
+    greenOneY = canvasData.height / 10;
+    greenTwoX = greenOneX;
+    greenTwoY = greenOneY + playerSeparation;
+    greenThreeX = greenOneX + playerSeparation;
+    greenThreeY = greenOneX;
+    greenFourX = greenOneX + 2 * playerSeparation;
+    greenFourY = greenOneY;
+    greenFiveX = greenFourX - playerSeparation;
+    greenFiveY = greenFourY + playerSeparation;
+    greenSixX = greenFourX - 2 * playerSeparation;
+    greenSixY = greenFourY + 2 * playerSeparation;
+    hitCount = 0;
+    hitTime = 0;
+    canvasData.greenPlayersList[canvasData.greenPlayersList.length] =
+        new Player(greenOneX, greenOneY, hitTime, hitCount);
+    canvasData.greenPlayersList[canvasData.greenPlayersList.length] =
+        new Player(greenTwoX, greenTwoY, hitTime, hitCount);
+    canvasData.greenPlayersList[canvasData.greenPlayersList.length] =
+        new Player(greenThreeX,greenThreeY,hitTime, hitCount);
+    if (level == 2) {
+        canvasData.greenPlayersList[canvasData.greenPlayersList.length] =
+        new Player(greenFourX, greenFourY, hitTime, hitCount);
+        canvasData.greenPlayersList[canvasData.greenPlayersList.length] =
+        new Player(greenFiveX, greenFiveY, hitTime, hitCount);
+        canvasData.greenPlayersList[canvasData.greenPlayersList.length] =
+        new Player(greenSixX, greenSixY, hitTime, hitCount);
+    }
+    canvasData.greenOrders = new Array(canvasData.greenPlayersList.length).fill(0);
+    // for (player = 0; player < canvasData.greenPlayersList.length; player++) {
+    //     drawGreenPlayers(player);
+    // }
+}
+
+function drawGreenPlayers(player) { //creates green players
+    x = canvasData.greenPlayersList[player].x;
+    y = canvasData.greenPlayersList[player].y;
+    hitCount = canvasData.greenPlayersList[player].hitCount;
+    hitTime = canvasData.greenPlayersList[player].hitTime;
+    gStand = canvasData.images["gstand"];        //at given location
+    gHit = canvasData.images["ghit"];
+    gThrow = canvasData.images["gthrow"];
+    gBrushOne = canvasData.images["gbrushOne"];
+    gBrushTwo = canvasData.images["gbrushTwo"];
+    maxHitCount = canvasData.maxHitCount;
+    playerWidth = 2 * canvasData.playerRadius;
+    playerHeight = 2 * canvasData.playerRadius;
+    if (hitCount == maxHitCount) { //player has been hit 3 times, player is dead
+        canvasData.audios["dead"].play(); //add player to dead list
+        canvasData.deadGreen.push([x, y]); //remove from alive list
+        canvasData.greenPlayersList.splice(player, 1);
+    }
+    else if (hitTime > 0) { //player is hit
+        if (hitCount ==1) { //first time being hit,player brushes snow off face
+            if (hitTime > 50) { 
+                gBrushOne = canvasData.images["gBrushOne"];
+                ctx.drawImage(gBrushOne, x, y, playerWidth, playerHeight);
+            }
+            else {
+                gBrushTwo = canvasData.images["gBrushTwo"];
+                ctx.drawImage(gBrushTwo, x, y, playerWidth, playerHeight);
+            }
+        }
+        else if (hitCount == 2) {
+            gHit = canvasData.images["gHit"];
+            ctx.drawImage(gHit, x, y, playerWidth, playerHeight);
+        }
+    }
+    else if (canvasData.greenOrders[player] == -1) { //player must wait until snowball lands 
+        gThrow = canvasData.images["gThrow"];
+        ctx.drawImage(gThrow, x, y, playerWidth, playerHeight);
+    }
+    else {
+        gStand = canvasData.images["gStand"];
+        ctx.drawImage(gStand, x, y, playerWidth, playerHeight);
+    }
+}
+
 function incrementImagesCount() {
     imageCount++;
 }
@@ -103,10 +191,6 @@ function initAudios() {
     canvasData.audios["newLevel"] = newLevel;
 }
 
-function playNewLevel() {
-	canvasData.audios["newLevel"].play();
-}
-
 function keyPressed(e) {
     if (e.key == "Enter" && canvasData.level == 0 && canvasData.instruction == false) { // must be at starting screen
         startGame();
@@ -114,9 +198,9 @@ function keyPressed(e) {
     if (e.key == "h") {
     	setInstructions();
     }
-    // if (e.key == "w") {
-    //     canvasData.greenPlayersList = [] #cheats
-    // }
+    if (e.key == "w") {
+        canvasData.greenPlayersList = []; //cheats
+    }
     if (e.key == "l") {
         canvasData.redPlayersList = []; //cheats
     }
@@ -137,7 +221,7 @@ function keyPressed(e) {
 }
 
 function startGame() { //start the game
-    playNewLevel();
+    canvasData.audios["newLevel"].play();
     canvasData.loadTimer = 100
     canvasData.level = 1
     init();
@@ -179,14 +263,17 @@ function redrawAll() {
     if (canvasData.level == 0) {
         drawStartScreen(); //starting screen
     }
-    // if len(canvasData.redPlayersList) ==0 or\
-    //    len(canvasData.greenPlayersList)==0:
-    //     canvasData.paused = True //game is paused in between levels
-    //     canvasData.playerSelected[0]=False //player is no longer selected
+    if (canvasData.redPlayersList.length ==0 ||
+        canvasData.greenPlayersList.length ==0) {
+        canvasData.paused = true; //game is paused in between levels
+        canvasData.playerSelected[0] = false; //player is no longer selected
+    }
     for (player = 0; player < canvasData.redPlayersList.length; player++) {
         drawRedPlayers(player);
     }
-    // for player in canvasData.greenPlayersList: createGreenPlayers(player)
+    for (player = 0; player < canvasData.greenPlayersList.length; player++) {
+        drawGreenPlayers(player);
+    }
     // if canvasData.snowballThrown == True: drawSnowball()
     // if canvasData.playerSelected[0] == True: drawThrowStrength(), snowHand()
     // drawFallingSnowBall(), drawSnowSplashes(), drawLevelLoad(), gameOver()
@@ -306,21 +393,15 @@ function init() {  //stores initial values
     canvasData.snowballSize = canvasData.playerRadius / 2;
     if (canvasData.level == 1) {
         initialRedPlayers();
-        // ,initialGreenLevelOne()
+        initialGreenLevel(1);
     }
     if (canvasData.level == 2) {
         initialRedPlayers();
-        // ,initialGreenLevelOne(),initialGreenLevelTwo()
+        initialGreenLevel(2);
     }
-    // for (player in canvas.data.redPlayersList)
+    // for (player in canvasData.redPlayersList)
     //     createRedPlayers(element);
 
-}
-
-function Player(x, y, hitTime) {
-    this.x = x;
-    this.y = y;
-    this.hitTime = hitTime;
 }
 
 function initialRedPlayers() { //creates 3 red players at initial locations
@@ -353,7 +434,7 @@ function drawRedPlayers(player) {  //creates red players at given location
     playerHeight = playerRadius * 2;
     if (hitTime > canvasData.hitTime) { //the player was hit while stunned
         dead.play();
-        delete canvasData.redPlayers.player;
+        canvasData.redPlayersList.splice(player, 1);
         canvasData.deadRed.push([x, y]); //draw dead player on background
     }
     else if (hitTime > 0) { //the player was hit while not stunned
@@ -381,6 +462,8 @@ window.onload = function () {
     canvasData.instruction = false;
     canvasData.playerSelected = [false, 0, 0];
     canvasData.redPlayersList = [];
+    canvasData.commands = ["Move","Throw"];
+    canvasData.directions = ["Left","Up","Right","Down"];
 	init();
 	delay = 5;
 	setInterval(timerFired, delay);
