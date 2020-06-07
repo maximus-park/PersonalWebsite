@@ -81,7 +81,7 @@ function drawGreenPlayers(player) { //creates green players
         canvasData.greenPlayersList.splice(player, 1);
     }
     else if (hitTime > 0) { //player is hit
-        if (hitCount ==1) { //first time being hit,player brushes snow off face
+        if (hitCount == 1) { //first time being hit,player brushes snow off face
             if (hitTime > 50) { 
                 gBrushOne = canvasData.images["gBrushOne"];
                 ctx.drawImage(gBrushOne, x, y, playerWidth, playerHeight);
@@ -255,13 +255,13 @@ function drawStartScreen() {  //starting screen
 
 function redrawAll() {
     clearCanvas();
-    drawBackGround(); //draws background
+    drawBackGround(); 
     if (canvasData.instruction == true) {
-        drawInstructions(); //draw instructions
-        return; //don't do anything else
+        drawInstructions();
+        return;
     }
     if (canvasData.level == 0) {
-        drawStartScreen(); //starting screen
+        drawStartScreen();
     }
     if (canvasData.redPlayersList.length ==0 ||
         canvasData.greenPlayersList.length ==0) {
@@ -274,9 +274,35 @@ function redrawAll() {
     for (player = 0; player < canvasData.greenPlayersList.length; player++) {
         drawGreenPlayers(player);
     }
-    // if canvasData.snowballThrown == True: drawSnowball()
+    if (canvasData.snowballThrown) {
+        drawSnowball();
+    }
     // if canvasData.playerSelected[0] == True: drawThrowStrength(), snowHand()
     // drawFallingSnowBall(), drawSnowSplashes(), drawLevelLoad(), gameOver()
+}
+
+function drawSnowball() { //draws snowball and shadow for both green and red
+    canvasData.snow = canvasData.redSnow.concat(canvasData.greenSnow);
+    shadowDistance = canvasData.shadowDistance;
+    for (i = 0; i < canvasData.snow.length; i++) { //for each snowball
+        snowball = canvasData.snow[i]
+        snowData = canvasData.d[snowball];
+        x = snowData[0];
+        y = snowData[1];
+        radiusX = snowData[2];
+        radiusY = snowData[3];
+        throwStrength = snowData[4];
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(x, y, radiusX, radiusY, 0, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.ellipse(x, y + shadowDistance, radiusX, radiusY, 0, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.fill();
+    }
 }
 
 ////////////////////////Instructions
@@ -314,6 +340,110 @@ function drawBackGround() {
 	ctx.drawImage(background, 0, 0, width, height);
 }
 
+////////////////////////Mouse Events
+function leftMousePressed(e) {
+    if (canvasData.paused == true || e.button != 0) {
+        return;
+    }
+    canvasData.throwStrength = 0
+    canvasData.mouse["leftPosn"] = [e.offsetX, e.offsetY];
+    playerRadius = canvasData.playerRadius
+    for (player = 0; player < canvasData.redPlayersList.length; player++) {
+        x = canvasData.redPlayersList[player].x;
+        y = canvasData.redPlayersList[player].y;
+        hitTime = canvasData.redPlayersList[player].hitTime;
+        if (e.offsetX >= (x - playerRadius) && e.offsetX <= (x + playerRadius) &&
+            e.offsetY >= (y - playerRadius) && e.offsetY <= (y + playerRadius) &&
+            hitTime == 0) { //check if player is selected, hit player cannot be selected
+            canvasData.playerSelected = [true, x, y];
+            canvasData.xDistance = e.offsetX - x;
+            canvasData.yDistance = e.offsetY - y;
+        }
+    }
+}
+                
+function leftMouseMoved(e) {  //only if game is not paused and player is selected
+    if (canvasData.paused == true || canvasData.playerSelected[0] == false) {
+        return;
+    }
+    canvasData.mouse["leftPosn"] = [e.offsetX, e.offsetY];
+    playerRadius = canvasData.playerRadius;
+    truth = canvasData.playerSelected[0];
+    x = canvasData.playerSelected[1];
+    y = canvasData.playerSelected[2];
+    xDistance = canvasData.xDistance;
+    yDistance = canvasData.yDistance;
+    xPlayer = e.offsetX - xDistance;
+    yPlayer = e.offsetY - yDistance;
+    hitTime = 0; //if player is selected, player could not have been hit
+    //player cannot move to enemy territory
+    if (e.offsetX + e.offsetY <= canvasData.width) {
+        xPlayer = canvasData.width - yPlayer;
+    }
+    //player may not move out of bounds
+    if (e.offsetX >= canvasData.width) {
+        xPlayer = canvasData.width - playerRadius;
+    }
+    //player may not move out of bounds
+    if (e.offsetY >= canvasData.height) {
+        yPlayer = canvasData.height - playerRadius;
+    }
+    else { //player may not move out of bounds
+        if (e.offsetX < 0) {
+            xPlayer = 0;
+            yPlayer = canvasData.height;
+        }
+        if (e.offsetY < 0) {
+            yPlayer = 0;
+            xplayer = canvasData.width;
+        }
+    }
+    n = 0;
+    for (i = 0; i < canvasData.redPlayersList.length; i++) {
+        p = canvasData.redPlayersList[i];
+        if (p.x == x && p.y == y) {
+            n = i;
+            break;
+        }
+    }
+    canvasData.redPlayersList[n].x = xPlayer;
+    canvasData.redPlayersList[n].y = yPlayer;
+    canvasData.redPlayersList[n].hitTime = hitTime;
+    canvasData.playerSelected = [truth, xPlayer, yPlayer];    //new location
+}
+                
+function leftMouseReleased(e) {
+    if (canvasData.playerSelected[0] == false || e.button != 0) {
+        return;
+    }
+    canvasData.audios["redThrow"].play();
+    canvasData.mouse["leftPosn"] = (e.offsetX, e.offsetY)
+    canvasData.playerSelected[0] = false     //player is no longer selected
+    throwSnowBall(); //upon release, snowball is thrown
+}
+
+    
+////////////////////////
+////////////////////////Snow Ball
+function throwSnowBall() { //snow ball is thrown
+    canvasData.snowBallCounter += 1; //nth snowball
+    canvasData.redSnow.push(canvasData.snowBallCounter); //add snowball to list
+    snowballSize = canvasData.snowballSize;
+    playerRadius = canvasData.playerRadius;
+    throwStrength = canvasData.throwStrength;
+    truth = canvasData.playerSelected[0];
+    x = canvasData.playerSelected[1];
+    y = canvasData.playerSelected[2];
+    canvasData.d[canvasData.snowBallCounter] = [
+        x + playerRadius - snowballSize / 2, 
+        y - playerRadius + snowballSize / 2,
+        snowballSize / 2,
+        snowballSize / 2,
+        throwStrength
+    ];
+    canvasData.snowballThrown = true;
+}
+////////////////////////
 function waitImagesLoad() {
     if (Object.keys(canvasData.images).length == imageCount) {
         imagesLoaded = true;
@@ -341,14 +471,13 @@ function timerFired() {
     if (canvasData.playerSelected[0] == true) {
     	canvasData.throwStrength += 1;
     }
-    snowBallSpeed = canvasData.snowBallSpeed;     //throw strength increases
-    // for (i = 0; i < canvasData.redSnow.length; i++) {
-    // 	index = canvasData.redSnow[i];
-    //     (l, t, r, b, throwStrength) = canvasData.d[index]; //move snowball
-    //     canvasData.d[index] = (l - snowBallSpeed, t - snowBallSpeed, 
-    //                            r - snowBallSpeed, b - snowBallSpeed, 
-    //                            throwStrength - 1);
-    // }
+    snowBallSpeed = canvasData.snowBallSpeed;
+    for (i = 0; i < canvasData.redSnow.length; i++) {
+    	index = canvasData.redSnow[i];
+        canvasData.d[index][0] -= snowBallSpeed;
+        canvasData.d[index][1] -= snowBallSpeed;
+        canvasData.d[index][4] -= 1;
+    }
     // for element in canvasData.greenSnow: //move snowball
     //     (l, t, r, b, throwStrength) = canvasData.d[element]
     //     canvasData.d[element]=(l+snowBallSpeed, t+snowBallSpeed, \
@@ -387,7 +516,7 @@ function init() {  //stores initial values
     canvasData.mouse["leftPosn"] = (0, 0)
     canvasData.steps = 50;
     canvasData.snowBallCounter = 0;
-    canvasData.playerRadius = width / 30;
+    canvasData.playerRadius = width / 35;
     canvasData.paused = false;
     canvasData.snowballThrown = false;
     canvasData.snowballSize = canvasData.playerRadius / 2;
@@ -399,9 +528,6 @@ function init() {  //stores initial values
         initialRedPlayers();
         initialGreenLevel(2);
     }
-    // for (player in canvasData.redPlayersList)
-    //     createRedPlayers(element);
-
 }
 
 function initialRedPlayers() { //creates 3 red players at initial locations
@@ -419,6 +545,18 @@ function initialRedPlayers() { //creates 3 red players at initial locations
     canvasData.redPlayersList[0] = new Player(redOneX, redOneY, hitTime);
     canvasData.redPlayersList[1] = new Player(redTwoX, redTwoY, hitTime);
     canvasData.redPlayersList[2] = new Player(redThreeX, redThreeY, hitTime);
+}
+
+function isEqualArrays(a, b) {
+    if (a.length != b.length) {
+        return false;
+    }
+    for (i = 0; i < a.length; i++) {
+        if (a[i] != b[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 function drawRedPlayers(player) {  //creates red players at given location
@@ -439,17 +577,16 @@ function drawRedPlayers(player) {  //creates red players at given location
     }
     else if (hitTime > 0) { //the player was hit while not stunned
         rPlayerHit = canvasData.images["rPlayerHit"];
-        ctx.drawImage(rPlayerHit, x, y - playerRadius, playerWidth, playerHeight);
+        ctx.drawImage(rPlayerHit, x - playerRadius, y - playerRadius, playerWidth, playerHeight);
     }
-    else if (canvasData.playerSelected == [true, x, y]) { //draw image for selected player
+    else if (isEqualArrays(canvasData.playerSelected, [true, x, y])) { //draw image for selected player
         rSelected = canvasData.images["rSelected"];
-        ctx.drawImage(rSelected, x, y - playerRadius, playerWidth, playerHeight);
+        ctx.drawImage(rSelected, x - playerRadius, y - playerRadius, playerWidth, playerHeight);
     }
-    else {
+    else { //otherwise, player is just standing
         rStand = canvasData.images["rStand"];
-        ctx.drawImage(rStand, x, y - playerRadius, playerWidth, playerHeight);
+        ctx.drawImage(rStand, x - playerRadius, y - playerRadius, playerWidth, playerHeight);
     }
-    //otherwise, player is just standing
 }
 
 window.onload = function () {
@@ -468,6 +605,9 @@ window.onload = function () {
 	delay = 5;
 	setInterval(timerFired, delay);
     document.addEventListener('keypress', keyPressed);
+    document.addEventListener("mousedown", leftMousePressed);
+    document.addEventListener("mousemove", leftMouseMoved);
+    document.addEventListener("mouseup", leftMouseReleased);
 };
 
 
