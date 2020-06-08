@@ -199,16 +199,16 @@ function keyPressed(e) {
     // if (e.key == "q") {
     //     qPressed();
     // }
-    // if (e.key == "r") {
-    //     rPressed();
-    // }
-    // if (e.key=="p" && canvasData.instruction == false)  {
-    //     canvasData.paused = !canvasData.paused
-    // }
-    // if (e.key == "n"
-    //    and len(canvasData.greenPlayersList) == 0 and canvasData.level != 0) {
-    //     nPressed(); //can only go to next level when player has beaten level
-    // }
+    if (e.key == "r" && canvasData.level != 0) {
+        restart();
+    }
+    if (e.key=="p" && canvasData.instruction == false)  {
+        canvasData.paused = !canvasData.paused
+    }
+    if (e.key == "n"
+       && canvasData.greenPlayersList.length == 0 && canvasData.level != 0) {
+        nextLevel(); //can only go to next level when player has beaten level
+    }
     // redrawAll();                                  
 }
 
@@ -219,9 +219,23 @@ function startGame() { //start the game
     init();
 }
 
+function restart(){ //restart level
+    canvasData.audios["newLevel"].play();
+    canvasData.instruction = false;
+    canvasData.loadTimer = 300;
+    init();
+}
+
 function setInstructions() { //show instructions
     canvasData.instruction = !canvasData.instruction;
     canvasData.paused = !canvasData.paused;
+}
+
+function nextLevel() { //n is pressed
+    canvasData.loadTimer = 300;
+    canvasData.level = (canvasData.level + 1) % 3; //2 levels max
+    canvasData.audios["newLevel"].play();
+    init();
 }
 
 ////////////////////////Game Over 
@@ -244,6 +258,7 @@ function gameOver() {
     }
     textSize = 20;
     ctx.font = textSize + textFont;
+    ctx.fillStyle = "blue";
     for (i = 0; i < text.length; i++) {
         ctx.fillText(text[i], width / 2, height / 2 - (textSize * text.length / 2) + textSize * i);
     }
@@ -311,7 +326,6 @@ function redrawAll() {
     }
     drawFallingSnowBall();
     drawSnowSplashes();
-    //gameOver()
 }
 
 
