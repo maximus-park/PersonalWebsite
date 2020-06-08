@@ -214,8 +214,8 @@ function keyPressed(e) {
 
 function startGame() { //start the game
     canvasData.audios["newLevel"].play();
-    canvasData.loadTimer = 100
-    canvasData.level = 1
+    canvasData.loadTimer = 300;
+    canvasData.level = 1;
     init();
 }
 
@@ -254,6 +254,11 @@ function redrawAll() {
     }
     if (canvasData.level == 0) {
         drawStartScreen();
+        return;
+    }
+    if (canvasData.level > 0 && canvasData.loadTimer > 0) {
+        drawLevelLoad();
+        return;
     }
     if (canvasData.redPlayersList.length ==0 ||
         canvasData.greenPlayersList.length ==0) {
@@ -273,8 +278,29 @@ function redrawAll() {
         drawThrowStrength();
         snowHand();
     }
-    // drawFallingSnowBall(), drawSnowSplashes(), drawLevelLoad(), gameOver()
+    drawFallingSnowBall();
+    drawSnowSplashes();
+    //gameOver()
 }
+
+
+function drawLevelLoad() { //draws loading screen for level
+    x = canvasData.width;
+    y = canvasData.height;
+    level = canvasData.level
+
+    canvasData.paused = true
+    canvasData.loadTimer -= 1
+    text = "Level " + level.toString();
+    textSize = 50;
+    ctx.font = textSize + textFont;
+    ctx.fillStyle = "blue";
+    ctx.fillText(text, x / 2, y / 2);
+    if (canvasData.loadTimer == 0) {
+        canvasData.paused = false;
+    }
+}
+
 
 function drawThrowStrength() { //draws the meter next to selected player indicating the
     x = canvasData.playerSelected[1];
@@ -316,6 +342,68 @@ function drawSnowball() { //draws snowball and shadow for both green and red
         ctx.ellipse(x, y + shadowDistance, radiusX, radiusY, 0, 0, 2 * Math.PI);
         ctx.stroke();
         ctx.fill();
+    }
+}
+
+function drawFallingSnowBall() { //draws the falling snow ball at the end of it's
+    for (var i = 0; i < canvasData.fallingSnowBall.length; i++) {
+        console.log("test");
+        snowBall = canvasData.fallingSnowBall[i];
+        x = snowBall[0];
+        y = snowBall[1];
+        radiusX = snowBall[2];
+        radiusY = snowBall[3];
+        shadowDistance = snowBall[4];
+        if (shadowDistance == 0) {
+            canvasData.fallingSnowBall.splice(i, 1);
+            splashTime = 1000; //splash stays on screen for 5 miliseconds
+            canvasData.snowSplashes.push([x, y, splashTime]);
+            continue
+        }
+        fSpeed = canvasData.fallSpeed;
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.ellipse(
+            x, 
+            y + shadowDistance, 
+            radiusX, 
+            radiusY, 
+            0, 
+            0, 
+            2 * Math.PI
+        );
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.ellipse(
+            x, 
+            y, 
+            radiusX, 
+            radiusY, 
+            0, 
+            0, 
+            2 * Math.PI
+        );
+        ctx.fill();
+        ctx.stroke();
+        canvasData.fallingSnowBall[i] = [x - 1, y + fSpeed, radiusX, radiusY, shadowDistance - fSpeed];
+    }
+}
+
+function drawSnowSplashes() { //at the end of the snowball's fall, the snowball makes
+    snowSplash = canvasData.images["snowSplash"];
+    for (var i = 0; i < canvasData.snowSplashes.length; i++) {
+        splash = canvasData.snowSplashes[i];
+        x = splash[0];
+        y = splash[1];
+        splashTime = splash[2];
+        if (splashTime == 0) {
+            canvasData.snowSplashes.splice(i, 1);
+            continue;
+        }
+        ctx.drawImage(snowSplash, x, y, canvasData.snowballSize, canvasData.snowballSize);
+        canvasData.snowSplashes[i][2]--;
     }
 }
 
@@ -427,6 +515,21 @@ function drawBackGround() {
     height = canvasData.height;
     background = canvasData.images["background"]
 	ctx.drawImage(background, 0, 0, width, height);
+    rDead = canvasData.images["rDead"];
+    gDead = canvasData.images["gDead"];
+    playerRadius = canvasData.playerRadius;
+    playerWidth = playerRadius * 4;  // * 4 because the dead pictures are a bit smaller
+    playerHeight = playerRadius * 4;
+    for (var i = 0; i < canvasData.deadRed.length; i++) {//draw dead players as part of the background
+        player = canvasData.deadRed[i];
+        [x, y] = player;
+        ctx.drawImage(rDead, x, y, playerWidth, playerHeight);
+    }
+    for (var i = 0; i < canvasData.deadGreen.length; i++) {
+        player = canvasData.deadGreen[i];
+        [x, y] = player;
+        ctx.drawImage(gDead, x - playerRadius, y - playerRadius, playerWidth, playerHeight);
+    }
 }
 
 function snowHand() { //draws snowball in the hand of the selected player
@@ -612,13 +715,13 @@ function init() {  //stores initial values
     canvasData.deadGreen = [];
     canvasData.snowSplashes = [];
     canvasData.fallingSnowBall = []; 
-    canvasData.snowBallSpeed = 5;
+    canvasData.snowBallSpeed = 3;
     canvasData.boxHeight = 5;
     canvasData.boxWidth = 10;
     canvasData.playerSelected = [false, 0, 0];
     width = canvasData.width;
     canvasData.hitTime = 500;
-    canvasData.fallSpeed= 5;
+    canvasData.fallSpeed= 0.5;
     canvasData.redPlayersList = [];
     canvasData.greenPlayersList = [];
     canvasData.redSnow = [];
