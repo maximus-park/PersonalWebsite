@@ -196,9 +196,9 @@ function keyPressed(e) {
     if (e.key == "l") {
         canvasData.redPlayersList = []; //cheats
     }
-    // if (e.key == "q") {
-    //     qPressed();
-    // }
+    if (e.key == "q") {
+        quit();
+    }
     if (e.key == "r" && canvasData.level != 0) {
         restart();
     }
@@ -210,6 +210,12 @@ function keyPressed(e) {
         nextLevel(); //can only go to next level when player has beaten level
     }
     // redrawAll();                                  
+}
+
+function quit() { //quit to main menu
+    canvasData.instruction = false;
+    canvasData.level = 0;
+    init();
 }
 
 function startGame() { //start the game
