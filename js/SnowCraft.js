@@ -224,6 +224,33 @@ function setInstructions() { //show instructions
     canvasData.paused = !canvasData.paused;
 }
 
+////////////////////////Game Over 
+function gameOver() {
+    width = canvasData.width;
+    height = canvasData.height;
+    var text = [];
+    if (canvasData.redPlayersList.length == 0 && canvasData.level > 0) { //red loses.
+        text[text.length] = "";
+        text[text.length] = "You Lose.";
+        text[text.length] = "Press 'r' to restart level.";
+        text[text.length] = "Press 'h' for help";
+    }
+    else if (canvasData.greenPlayersList.length == 0 && canvasData.level > 0) {
+        text[text.length] = "";
+        text[text.length] = "You Win!!";
+        text[text.length] = "Press 'n' for next level.";
+        text[text.length] = "Press 'r' to restart level.";
+        text[text.length] = "Press 'h' for help";
+    }
+    textSize = 20;
+    ctx.font = textSize + textFont;
+    for (i = 0; i < text.length; i++) {
+        ctx.fillText(text[i], width / 2, height / 2 - (textSize * text.length / 2) + textSize * i);
+    }
+}
+    
+////////////////////////
+
 function clearCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -260,10 +287,14 @@ function redrawAll() {
         drawLevelLoad();
         return;
     }
-    if (canvasData.redPlayersList.length ==0 ||
-        canvasData.greenPlayersList.length ==0) {
+    if (canvasData.redPlayersList.length == 0 ||
+        canvasData.greenPlayersList.length == 0) {
         canvasData.paused = true; //game is paused in between levels
         canvasData.playerSelected[0] = false; //player is no longer selected
+        if (canvasData.level > 0) {
+            gameOver();
+            return;
+        }
     }
     for (player = 0; player < canvasData.redPlayersList.length; player++) {
         drawRedPlayers(player);
