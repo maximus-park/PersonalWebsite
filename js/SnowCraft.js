@@ -397,7 +397,6 @@ function drawSnowball() { //draws snowball and shadow for both green and red
 
 function drawFallingSnowBall() { //draws the falling snow ball at the end of it's
     for (var i = 0; i < canvasData.fallingSnowBall.length; i++) {
-        console.log("test");
         snowBall = canvasData.fallingSnowBall[i];
         x = snowBall[0];
         y = snowBall[1];
@@ -470,7 +469,7 @@ function checkGreen() { //go through each player in list
                 continue; //if it is second hit, player is on ground and cant be hit
             }
         }
-        checkGreenHit(i);
+    	checkGreenHit(i);
     }
 }
 
@@ -583,7 +582,6 @@ function checkRed() { //check if a red player has been hit
             t = snowY + snowYRadius;
             r = snowX + snowXRadius;
             b = snowY - snowYRadius;
-            console.log("l: " + l.toString() + " r: " + r.toString() + " t: " + t.toString() + " b: " + b.toString());
             if ((l < 0) || (t < 0) ||
                 (r > canvasData.width) || (b > canvasData.height)) {
                 //snowball is out of bounds
@@ -673,7 +671,7 @@ function leftMouseMoved(e) {  //only if game is not paused and player is selecte
     yPlayer = e.offsetY - yDistance;
     hitTime = 0; //if player is selected, player could not have been hit
     //player cannot move to enemy territory
-    if (yPlayer <= -1/2 * xPlayer + canvasData.height) {
+    if (yPlayer <= -0.5 * xPlayer + canvasData.height) {
         xPlayer = canvasData.width * (1 - yPlayer / canvasData.height);
     }
     //player may not move out of bounds
@@ -725,7 +723,8 @@ function leftMouseReleased(e) {
 
 function greenPlayerAI() {  //the AI for the green players
     for (var i = 0; i < canvasData.greenPlayersList.length; i++) {
-        if (canvasData.greenPlayersList[i][3] > 0) {
+    	hitTime = canvasData.greenPlayersList[i].hitTime;
+        if (hitTime > 0) {
             continue;
         }
         else if (canvasData.greenOrders[i] == 0) { //green player is doing nothing
@@ -774,7 +773,6 @@ function greenCommand(player, command) { //gives the given green player a comman
     else if (command == "Move") { //green player is told to move
         directions = canvasData.directions;
         n = getRandomInt(directions.length);
-        // n = random.randint(0,len(directions)-1)
         direction = directions[n]; //randomizes the direction
         steps = canvasData.steps;
         canvasData.greenOrders[player] = [steps, direction]; //player moves
@@ -792,7 +790,7 @@ function moveGreen(player) { //moves green player in a given direction
     width = canvasData.width;
     height = canvasData.height;
     playerRadius = canvasData.playerRadius;
-    if (steps ==0) {
+    if (steps == 0) {
         canvasData.greenOrders[player] = 0;
     }
     else {
@@ -808,8 +806,7 @@ function moveGreen(player) { //moves green player in a given direction
         else if (direction == "Up" && y - playerRadius > 0) {
             y -= stepSize;
         }
-        else if ((y + playerRadius) <= -1/2 * (x + playerRadius) + canvasData.height) {
-        // else if ((x + playerRadius) + (y + playerRadius) != canvasData.width) {
+        else if ((y + playerRadius) <= -0.5 * (x + playerRadius) + canvasData.height) {
             //player may not cross into enemy territory
             if (direction == "Right" && x <= canvasData.width) { 
                 x += stepSize;
