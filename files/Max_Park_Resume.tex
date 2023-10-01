@@ -1,0 +1,205 @@
+%-------------------------
+% Resume in Latex
+% Author : Max Park
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{txfonts}
+\input{glyphtounicode}
+
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{center}
+    \textbf{\Huge \scshape Max Hyunmin Park} \\ \vspace{1pt}
+    \small 201-916-9745 \\
+    \href{mailto:x@x.com}{maximushpark@gmail.com}  \\
+    \href{https://maximus-park.github.io/PersonalWebsite/}{maximus-park.github.io/PersonalWebsite}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Carnegie Mellon University}{Pittsburgh, PA}
+      {Bachelor of Science  in Computer Science, Minor in Psychology}{}
+  \resumeSubHeadingListEnd
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Encora Inc.}{Aug 2020 -- Feb 2023}
+      {Software Engineer}{C\#, .NET}
+      \resumeItemListStart
+        \resumeItem{Developed windows console application to receive and send Kafka messages}
+        \resumeItem{Implemented REST API endpoints on Azure function Blob triggers}
+        \resumeItem{Designed database tables, wrote SQL scripts for database operations to improve processing speed}
+        \resumeItem{Improved unit test code coverage to above 95\% to ensure accuracy and maintainability}
+      \resumeItemListEnd
+      
+% -----------Multiple Positions Heading-----------
+%    \resumeSubSubheading
+%     {Software Engineer I}{Oct 2014 - Sep 2016}
+%     \resumeItemListStart
+%        \resumeItem{Apache Beam}
+%          {Apache Beam is a unified model for defining both batch and streaming data-parallel processing pipelines}
+%     \resumeItemListEnd
+%    \resumeSubHeadingListEnd
+%-------------------------------------------
+
+    \resumeSubheading
+      {Sooryen Technologies}{Jun 2020 -- Aug 2020}
+      {Software Engineer}{Python, Django}
+      \resumeItemListStart
+        \resumeItem{Developed marketing data pipelines for a top 500 e-commerce client,handling over \$50 million in ad spending form a variety of marketing APIs}
+        \resumeItem{Maintained Google Cloud Platform based infrastructure over 25 Python based ETL pipelines and BigQuery tables}
+        \resumeItem{Led daily scrum calls with clients and managed the responsibilities for small team of 3 onshore/offshore developers using JIRA Agile methodologies}
+    \resumeItemListEnd
+
+    \resumeSubheading
+      {Sooryen Technologies}{Dec 2019 -- Jun 2020}
+      {Full Stack Intern}{Python, HTML, CSS, Django}
+      \resumeItemListStart
+        \resumeItem{Developed an MVP survey web application with admin capabilities for form creation using drag
+and drop question banks and customized frontend layouts for proposed client companies}
+        \resumeItem{Hosted on an AWS EC2 instance with a MySQL database where users log in with Google OAuth}
+        \resumeItem{Utilized Jenkins and Bitbucket for CI/CD and version control}
+        \resumeItem{Applied agile practices using JIRA}
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+      \resumeProjectHeading
+          {\textbf{SnowCraft}}{\emph{Python, Javascript}}
+          \resumeItemListStart
+            \resumeItem{Originally written in Python, converted SnowCraft game to JavaScript, enabling its successful integration on the website}
+            \resumeItem{Conducted rigorous testing and debugging to ensure the game's smooth functionality.}
+          \resumeItemListEnd
+      \resumeProjectHeading
+          {\textbf{ModelS}}{\emph{C, C++, Javascript, HTML}}
+          \resumeItemListStart
+            \resumeItem{Developed a 3D software package for rasterization, ray-tracing and animation}
+            \resumeItem{Collaborated with teammate to improve processing speed by 20\%}
+            \resumeItem{Implemented various methods of generating model, such as Pencil sketch which would rasterize model as if drawn in by pencil}
+          \resumeItemListEnd
+    \resumeSubHeadingListEnd
+
+
+
+%
+%-----------PROGRAMMING SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{:  C\#, Python, Javascript, C, C++, SQL, MySQL, HTML, CSS} \\
+     \textbf{Frameworks}{: .NET, Django} \\
+     \textbf{Developer Tools}{: Git, Docker, Google Cloud Platform, Azure, VS Code, Visual Studio}
+    }}
+ \end{itemize}
+
+
+%-------------------------------------------
+\end{document}
