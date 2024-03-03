@@ -161,12 +161,12 @@ function initImages() { //stores the images in dictionary
 function initAudios() {
 	canvasData.audios = {};
     var dead = new Audio("./files/SnowCraft/dead.wav");
-    var greenHit = new Audio("./files/SnowCraft/greenHit.wav");
-    var greenThrow = new Audio("./files/SnowCraft/greenThrow.wav");
-    var redHit = new Audio("./files/SnowCraft/redHit.wav");
-    var redThrow = new Audio("./files/SnowCraft/redThrow.wav");
+    var greenHit = new Audio("./files/SnowCraft/greenhit.wav");
+    var greenThrow = new Audio("./files/SnowCraft/greenthrow.wav");
+    var redHit = new Audio("./files/SnowCraft/redhit.wav");
+    var redThrow = new Audio("./files/SnowCraft/redthrow.wav");
     var footstep = new Audio("./files/SnowCraft/footstep.wav");
-    var newLevel = new Audio("./files/SnowCraft/newLevel.wav");
+    var newLevel = new Audio("./files/SnowCraft/newlevel.wav");
     dead.onload = incrementAudioCount;
     greenHit.onload = incrementAudioCount;
     greenThrow.onload = incrementAudioCount;
